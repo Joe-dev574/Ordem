@@ -9,20 +9,54 @@ final class PersistenceController {
     let container: ModelContainer
     
     private init(inMemory: Bool = false) {
-        let schema = Schema([Folder.self, Note.self])
-        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)
-        
+        let schema = Schema([Folder.self, Note.self, Attachment.self])
+
+        if inMemory {
+            do {
+                container = try ModelContainer(for: schema, configurations: [
+                    ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                ])
+            } catch {
+                fatalError("Preview container failed: \(error)")
+            }
+            return
+        }
+
+        // Pin to an explicit URL so we can destroy it on schema changes during development.
+        let storeURL = FileManager.default
+            .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("default.store")
+        let config = ModelConfiguration(schema: schema, url: storeURL)
+
         do {
             container = try ModelContainer(for: schema, configurations: [config])
-            
-            if !inMemory && !Self.hasSeededData {
-                let context = container.mainContext
-                seedInitialData(context: context)
-                try context.save()
-                Self.hasSeededData = true
-            }
         } catch {
+            #if DEBUG
+            // Schema changed — wipe the old store and start fresh.
+            // Before shipping, replace this block with a versioned SchemaMigrationPlan.
+            Self.destroyStore(at: storeURL)
+            Self.hasSeededData = false
+            do {
+                container = try ModelContainer(for: schema, configurations: [config])
+            } catch {
+                fatalError("Container failed after store reset: \(error)")
+            }
+            #else
             fatalError("ModelContainer failed: \(error)")
+            #endif
+        }
+
+        if !Self.hasSeededData {
+            seedInitialData(context: container.mainContext)
+            try? container.mainContext.save()
+            Self.hasSeededData = true
+        }
+    }
+
+    private static func destroyStore(at url: URL) {
+        let fm = FileManager.default
+        for suffix in ["", "-wal", "-shm"] {
+            try? fm.removeItem(at: URL(fileURLWithPath: url.path + suffix))
         }
     }
     

@@ -1,13 +1,8 @@
-//
-//  SidebarSelection.swift
-//  Ordem
-//
-//  Created by Joseph DeWeese on 5/13/26.
-//
-
 import Foundation
+import SwiftData
 
 enum SidebarSelection: Hashable {
     case allNotes
-    case folder(Folder)
+    case folder(id: PersistentIdentifier)
+    case recentlyDeleted
 }

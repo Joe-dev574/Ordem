@@ -6,14 +6,11 @@
 //
 
 import SwiftUI
-import SwiftData
-
 
 // MARK: - Note Row
 struct NoteRow: View {
     let note: Note
-    @Environment(\.modelContext) private var context
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(note.title.isEmpty ? "Untitled" : note.title)
@@ -27,11 +24,5 @@ struct NoteRow: View {
                 .foregroundStyle(.tertiary)
         }
         .padding(.vertical, 4)
-        .contextMenu {
-            Button(note.isPinned ? "Unpin Note" : "Pin Note") {
-                note.isPinned.toggle()
-                note.lastModified = .now
-            }
-        }
     }
 }
