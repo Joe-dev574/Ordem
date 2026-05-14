@@ -30,11 +30,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		377FBC1F2FB53C9400A4C7F4 /* Ordem */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Ordem;
-			sourceTree = "<group>";
-		};
 		377FBC2D2FB53C9600A4C7F4 /* OrdemTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = OrdemTests;
@@ -43,6 +38,11 @@
 		377FBC372FB53C9600A4C7F4 /* OrdemUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = OrdemUITests;
+			sourceTree = "<group>";
+		};
+		377FBC7B2FB541CA00A4C7F4 /* Ordem */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Ordem;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,7 +75,7 @@
 		377FBC142FB53C9400A4C7F4 = {
 			isa = PBXGroup;
 			children = (
-				377FBC1F2FB53C9400A4C7F4 /* Ordem */,
+				377FBC7B2FB541CA00A4C7F4 /* Ordem */,
 				377FBC2D2FB53C9600A4C7F4 /* OrdemTests */,
 				377FBC372FB53C9600A4C7F4 /* OrdemUITests */,
 				377FBC1E2FB53C9400A4C7F4 /* Products */,
@@ -108,7 +108,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				377FBC1F2FB53C9400A4C7F4 /* Ordem */,
+				377FBC7B2FB541CA00A4C7F4 /* Ordem */,
 			);
 			name = Ordem;
 			packageProductDependencies = (
@@ -408,6 +408,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tnt.Ordem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -440,6 +441,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tnt.Ordem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
