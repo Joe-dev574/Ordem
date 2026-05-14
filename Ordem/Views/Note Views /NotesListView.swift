@@ -67,6 +67,8 @@ struct NotesListView: View {
             }
         }
         .listStyle(.plain)
+        .workspaceSurface(.list)
+    
     }
 
     private var recentlyDeletedList: some View {
@@ -84,21 +86,25 @@ struct NotesListView: View {
             }
         }
         .listStyle(.plain)
+        .workspaceSurface(.list)
     }
 
     @ViewBuilder
     private var emptyState: some View {
-        switch sidebarSelection {
-        case .allNotes:
-            ContentUnavailableView("No Notes", systemImage: "note.text",
-                description: Text("Press ⌘N to create your first note."))
-        case .folder:
-            ContentUnavailableView("Empty Folder", systemImage: "folder",
-                description: Text("Press ⌘N to add a note to this folder."))
-        case .recentlyDeleted:
-            ContentUnavailableView("No Deleted Notes", systemImage: "trash",
-                description: Text("Deleted notes are kept here for 30 days."))
+        Group {
+            switch sidebarSelection {
+            case .allNotes:
+                ContentUnavailableView("No Notes", systemImage: "note.text",
+                    description: Text("Press ⌘N to create your first note."))
+            case .folder:
+                ContentUnavailableView("Empty Folder", systemImage: "folder",
+                    description: Text("Press ⌘N to add a note to this folder."))
+            case .recentlyDeleted:
+                ContentUnavailableView("No Deleted Notes", systemImage: "trash",
+                    description: Text("Deleted notes are kept here for 30 days."))
+            }
         }
+        .workspaceSurface(.list)
     }
 
     @ViewBuilder

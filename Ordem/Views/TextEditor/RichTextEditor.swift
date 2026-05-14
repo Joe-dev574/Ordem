@@ -154,6 +154,11 @@ final class ChecklistTextView: NSTextView {
 struct RichTextEditor: NSViewRepresentable {
     @Binding var contentData: Data
     let editorState: TextEditorState
+    var backgroundColor: NSColor = .textBackgroundColor
+    var textColor: NSColor = .textColor
+
+    @AppStorage("spellCheckEnabled") private var spellCheckEnabled = true
+    @AppStorage("smartPunctuationEnabled") private var smartPunctuationEnabled = false
 
     func makeNSView(context: Context) -> NSScrollView {
         let textView = ChecklistTextView(frame: .zero)
@@ -174,7 +179,13 @@ struct RichTextEditor: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let textView = scrollView.documentView as? NSTextView else { return }
         editorState.textView = textView
-        // Skip if this update originated from the editor itself
+        // Always sync appearance and behavior so settings changes take effect immediately
+        textView.backgroundColor = backgroundColor
+        textView.typingAttributes[.foregroundColor] = textColor
+        textView.isAutomaticSpellingCorrectionEnabled = spellCheckEnabled
+        textView.isAutomaticQuoteSubstitutionEnabled = smartPunctuationEnabled
+        textView.isAutomaticDashSubstitutionEnabled = smartPunctuationEnabled
+        // Skip content reload if this update originated from the editor itself
         guard contentData != context.coordinator.lastPushedData else { return }
         let savedRange = textView.selectedRange()
         loadContent(into: textView)
@@ -201,9 +212,10 @@ struct RichTextEditor: NSViewRepresentable {
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.isAutomaticSpellingCorrectionEnabled = true
+        textView.backgroundColor = backgroundColor
         textView.typingAttributes = [
             .font: NSFont.systemFont(ofSize: 14),
-            .foregroundColor: NSColor.textColor
+            .foregroundColor: textColor
         ]
     }
 

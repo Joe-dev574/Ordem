@@ -70,6 +70,7 @@ struct SidebarView: View {
                     .foregroundStyle(deletedNoteCount > 0 ? .primary : .secondary)
             }
         }
+        .workspaceSurface(.sidebar)
         .listStyle(.sidebar)
     }
 

@@ -21,6 +21,7 @@ struct OrdemApp: App {
             SettingsSheet()
                 .environment(errorManager)
         }
+        .modelContainer(PersistenceController.shared.container)
 
         // Menu Bar Extra (HIG Compliant)
         MenuBarExtra("Ordem", systemImage: "note.text") {

@@ -7,21 +7,21 @@ import SwiftData
 struct NoteEditorView: View {
     @Binding var selectedNote: Note?
     @State private var editorState = TextEditorState()
-
+    
     var body: some View {
         Group {
             if let note = selectedNote {
                 NoteEditorContent(note: note, editorState: editorState)
-                    .id(note.id)                    // Force refresh when note changes
+                    .id(note.id)
             } else {
                 ContentUnavailableView(
                     "No Note Selected",
                     systemImage: "note.text",
-                    description: Text("Select a note from the list or create a new one with ⌘N")
+                    description: Text("Select a note or create a new one with ⌘N")
                 )
             }
         }
-        // All formatting lives in the window chrome (macOS Pro Rules + HIG)
+        .workspaceSurface(.detail)
         .toolbar {
             RichTextFormatBar(editorState: editorState, isEnabled: selectedNote != nil)
         }
