@@ -1,48 +1,64 @@
 import SwiftUI
-import AppKit
+import SwiftData
 
 struct NoteEditorContent: View {
-    @Bindable var note: Note
+    let note: Note
     let editorState: TextEditorState
-    @State private var saveTask: Task<Void, Never>?
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            TextField("Title", text: $note.title)
-                .font(.title2.bold())
-                .textFieldStyle(.plain)
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-            Text(note.lastModified.formatted(date: .long, time: .shortened))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 4)
-            RichTextEditor(contentData: contentBinding, editorState: editorState)
-                .padding(.horizontal, 4)
-        }
-        .onChange(of: note.title) { _, _ in scheduleSave() }
-        .onDisappear { saveTask?.cancel() }
-    }
+    @Environment(\.modelContext) private var context
 
     private var contentBinding: Binding<Data> {
         Binding(
             get: { note.contentData },
             set: { newData in
                 note.contentData = newData
-                if let attrStr = NSAttributedString(rtf: newData, documentAttributes: nil) {
-                    note.content = attrStr.string
-                }
-                scheduleSave()
+                note.lastModified = .now
+                syncTitleFromFirstLine(newData)
+                try? context.save()
             }
         )
     }
 
-    private func scheduleSave() {
-        saveTask?.cancel()
-        saveTask = Task {
-            try? await Task.sleep(for: .seconds(1))
-            if !Task.isCancelled { note.lastModified = .now }
+    var body: some View {
+        RichTextEditor(contentData: contentBinding, editorState: editorState)
+            .onAppear {
+                ensureTitleAndSubtitle()
+            }
+    }
+
+    // MARK: - Title + Subtitle Logic
+
+    private func syncTitleFromFirstLine(_ data: Data) {
+        guard let attrStr = NSAttributedString(rtf: data, documentAttributes: nil) else { return }
+        let lines = attrStr.string.components(separatedBy: .newlines)
+        
+        if let firstLine = lines.first {
+            note.title = firstLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+    }
+
+    private func ensureTitleAndSubtitle() {
+        guard let attrStr = NSAttributedString(rtf: note.contentData, documentAttributes: nil) else { return }
+        let text = attrStr.string
+        let lines = text.components(separatedBy: .newlines)
+
+        // If first line is empty, insert title as large heading
+        if lines.first?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true && !note.title.isEmpty {
+            let titleAttr = NSAttributedString(
+                string: note.title + "\n",
+                attributes: [
+                    .font: NSFont.systemFont(ofSize: 26, weight: .bold),
+                    .foregroundColor: NSColor.labelColor
+                ]
+            )
+            
+            let mutable = NSMutableAttributedString(attributedString: attrStr)
+            mutable.insert(titleAttr, at: 0)
+            
+            if let newData = mutable.rtf(from: NSRange(location: 0, length: mutable.length),
+                                         documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]) {
+                note.contentData = newData
+            }
         }
     }
 }

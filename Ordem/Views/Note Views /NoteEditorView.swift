@@ -1,5 +1,9 @@
 import SwiftUI
+import SwiftData
 
+/// Main editor container for a single note.
+/// Follows Apple Notes behavior: title + date live inside the editable content,
+/// while all formatting controls live in the window toolbar.
 struct NoteEditorView: View {
     @Binding var selectedNote: Note?
     @State private var editorState = TextEditorState()
@@ -8,11 +12,16 @@ struct NoteEditorView: View {
         Group {
             if let note = selectedNote {
                 NoteEditorContent(note: note, editorState: editorState)
-                    .id(note.id)
+                    .id(note.id)                    // Force refresh when note changes
             } else {
-                ContentUnavailableView("No Note Selected", systemImage: "note.text")
+                ContentUnavailableView(
+                    "No Note Selected",
+                    systemImage: "note.text",
+                    description: Text("Select a note from the list or create a new one with ⌘N")
+                )
             }
         }
+        // All formatting lives in the window chrome (macOS Pro Rules + HIG)
         .toolbar {
             RichTextFormatBar(editorState: editorState, isEnabled: selectedNote != nil)
         }
