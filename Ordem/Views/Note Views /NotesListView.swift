@@ -23,6 +23,8 @@ struct NotesListView: View {
             return sorted(filtered(allNotes.filter { !$0.isDeleted }))
         case .folder(let id):
             return sorted(filtered(allNotes.filter { !$0.isDeleted && $0.folder?.persistentModelID == id }))
+        case .project(let id):
+            return sorted(filtered(allNotes.filter { !$0.isDeleted && $0.project?.persistentModelID == id }))
         }
     }
 
@@ -50,6 +52,9 @@ struct NotesListView: View {
                             .draggable(note.id.uuidString) { NoteDragPreview(note: note) }
                             .tag(note)
                             .contextMenu { noteContextMenu(for: note) }
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
                     }
                 }
             }
@@ -59,6 +64,9 @@ struct NotesListView: View {
                         .draggable(note.id.uuidString) { NoteDragPreview(note: note) }
                         .tag(note)
                         .contextMenu { noteContextMenu(for: note) }
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
                 }
                 .onMove { source, destination in
                     guard searchText.isEmpty else { return }
@@ -83,6 +91,9 @@ struct NotesListView: View {
                             deletePermanently(note)
                         }
                     }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
             }
         }
         .listStyle(.plain)
@@ -99,6 +110,9 @@ struct NotesListView: View {
             case .folder:
                 ContentUnavailableView("Empty Folder", systemImage: "folder",
                     description: Text("Press ⌘N to add a note to this folder."))
+            case .project:
+                ContentUnavailableView("No Notes in Project", systemImage: "doc.text",
+                    description: Text("Press ⌘N to add a note to this project."))
             case .recentlyDeleted:
                 ContentUnavailableView("No Deleted Notes", systemImage: "trash",
                     description: Text("Deleted notes are kept here for 30 days."))

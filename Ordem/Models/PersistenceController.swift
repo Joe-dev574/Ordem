@@ -9,7 +9,7 @@ final class PersistenceController {
     let container: ModelContainer
     
     private init(inMemory: Bool = false) {
-        let schema = Schema([Folder.self, Note.self, Attachment.self])
+        let schema = Schema([Folder.self, Note.self, Attachment.self, Tag.self, UserTask.self, Project.self])
 
         if inMemory {
             do {

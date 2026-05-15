@@ -1,18 +1,23 @@
 import SwiftUI
 import SwiftData
 
-/// Main editor container for a single note.
-/// Follows Apple Notes behavior: title + date live inside the editable content,
-/// while all formatting controls live in the window toolbar.
 struct NoteEditorView: View {
     @Binding var selectedNote: Note?
     @State private var editorState = TextEditorState()
-    
+    @State private var isInspectorShown = false
+
     var body: some View {
         Group {
             if let note = selectedNote {
-                NoteEditorContent(note: note, editorState: editorState)
-                    .id(note.id)
+                HStack(spacing: 0) {
+                    NoteEditorContent(note: note, editorState: editorState)
+                    if isInspectorShown {
+                        Divider()
+                        NoteInspectorView(note: note)
+                            .id(note.id)
+                    }
+                }
+                .id(note.id)
             } else {
                 ContentUnavailableView(
                     "No Note Selected",
@@ -24,6 +29,15 @@ struct NoteEditorView: View {
         .workspaceSurface(.detail)
         .toolbar {
             RichTextFormatBar(editorState: editorState, isEnabled: selectedNote != nil)
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    isInspectorShown.toggle()
+                } label: {
+                    Label("Inspector", systemImage: "sidebar.right")
+                }
+                .disabled(selectedNote == nil)
+                .help("Toggle Inspector")
+            }
         }
     }
 }

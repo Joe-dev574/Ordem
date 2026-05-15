@@ -8,6 +8,7 @@ struct MainSplitView: View {
     @AppStorage("noteSort") private var noteSort: NoteSort = .dateEdited
 
     @Query(sort: \Folder.sortIndex) private var folders: [Folder]
+    @Query(sort: \Project.projectTitle) private var projects: [Project]
     @Environment(\.modelContext) private var context
     @Environment(ErrorManager.self) private var errorManager
 
@@ -53,10 +54,10 @@ struct MainSplitView: View {
 
     private func titleFor(_ selection: SidebarSelection) -> String {
         switch selection {
-        case .allNotes:       return "All Notes"
-        case .recentlyDeleted: return "Recently Deleted"
-        case .folder(let id):
-            return folders.first(where: { $0.persistentModelID == id })?.name ?? "Folder"
+        case .allNotes:         return "All Notes"
+        case .recentlyDeleted:  return "Recently Deleted"
+        case .folder(let id):   return folders.first(where: { $0.persistentModelID == id })?.name ?? "Folder"
+        case .project(let id):  return projects.first(where: { $0.persistentModelID == id })?.projectTitle ?? "Project"
         }
     }
 
@@ -64,6 +65,8 @@ struct MainSplitView: View {
         let newNote = Note(title: "Untitled", content: "")
         if case .folder(let id) = sidebarSelection {
             newNote.folder = folders.first(where: { $0.persistentModelID == id })
+        } else if case .project(let id) = sidebarSelection {
+            newNote.project = projects.first(where: { $0.persistentModelID == id })
         }
         context.insert(newNote)
         selectedNote = newNote

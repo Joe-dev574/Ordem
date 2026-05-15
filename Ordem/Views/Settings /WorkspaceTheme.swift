@@ -204,6 +204,14 @@ enum WorkspaceTheme: String, CaseIterable, Identifiable {
     var tertiaryTextColor: Color {
         Color.white.opacity(0.45)
     }
+
+    // MARK: - Card Chrome
+
+    var strokeColor: Color { Color.white.opacity(0.08) }
+    var strokeWidth: CGFloat { 0.5 }
+    var cardShadowColor: Color { Color.black.opacity(0.22) }
+    var cardShadowRadius: CGFloat { 4 }
+    var cardShadowY: CGFloat { 2 }
 }
 // MARK: - View Extension
 extension View {

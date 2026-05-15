@@ -9,6 +9,7 @@ struct NoteEditorContent: View {
     @AppStorage("workspaceTheme") private var themeRawValue = WorkspaceTheme.HAZ.rawValue
     private var theme: WorkspaceTheme { WorkspaceTheme(rawValue: themeRawValue) ?? .HAZ }
 
+
     private var contentBinding: Binding<Data> {
         Binding(
             get: { note.contentData },
@@ -16,6 +17,7 @@ struct NoteEditorContent: View {
                 note.contentData = newData
                 note.lastModified = .now
                 syncTitleFromFirstLine(newData)
+                syncPlainText(newData)          // keeps note.content current for search + task detection
                 try? context.save()
             }
         )
@@ -34,6 +36,12 @@ struct NoteEditorContent: View {
     }
 
     // MARK: - Title + Date Logic
+
+    private func syncPlainText(_ data: Data) {
+        guard let attrStr = NSAttributedString(rtf: data, documentAttributes: nil) else { return }
+        let plain = attrStr.string
+        if note.content != plain { note.content = plain }
+    }
 
     private func syncTitleFromFirstLine(_ data: Data) {
         guard let attrStr = NSAttributedString(rtf: data, documentAttributes: nil) else { return }
